@@ -1,56 +1,118 @@
-package main
-
+import main.Spot
+import main.Wall
+import main.Level
 import java.io.File
-import java.io.InputStream
 
-fun showMenu(optionNumber: String): String{
-    when (optionNumber){
-        "0"->
-        return("""
-            Menu:
-            Elija el tipo de usuario que desea utilizar
-            1. Administrador
-            2. Conductor
-            3. Salir
-        """.trimIndent())
-    "1" ->
-        return("""
-            Menu:
-            1. Crear nivel
-            2. Eliminar nivel
-            3. Ver todos los niveles
-            4. Salir
-        """.trimIndent())
-    "2"->
-        return("""
-            Menu:
-            1. Ingresar placa
-            2. Salir
-        """.trimIndent())
+var levelList: ArrayList<Level> = ArrayList()
+var newLevelWalls: ArrayList<Wall> = ArrayList()
+var newLevelSpot: ArrayList<Spot> = ArrayList()
+
+fun colorIsTaken(color: String):Boolean{
+    levelList.forEach {
+        if (it.color == color) {
+            return true
+        }
     }
-    return ""
+    return false
 }
 
-fun readLines(fileName: String){
-    var mapAsLines: ArrayList<String> = ArrayList()
-    val file: InputStream = File(fileName).inputStream()
-    file.bufferedReader().useLines { lines->lines.forEach { mapAsLines.add(it)} }
+fun readFile(direction: String):ArrayList<String>{
+    val mapAsLines: ArrayList<String> = ArrayList()
+    File(direction).forEachLine{mapAsLines.add(it)}
+    return mapAsLines
 }
+
+fun spotIsRepeated(map:ArrayList<String>):Boolean{
+    var testList:ArrayList<String> = ArrayList()
+    map.forEach{
+        it.forEach {
+            var testString = Character.toString(it)
+            if(testString in testList){
+                return true
+            }
+        }
+    }
+    return false
+}
+
+fun directionIsValid(direction: String): Boolean{
+    try {
+        var newMap = readFile(direction)
+        if (spotIsRepeated(newMap)){
+            return false
+        }
+        return true
+    }catch (e: java.io.FileNotFoundException){
+        return false
+    }
+}
+
+fun showMenu(option: Int):String{
+    when(option){
+        0->return "Menu 1"
+    }
+    return "No válido"
+}
+
+fun createLists(map: ArrayList<String>){
+    var x = 0
+    var y = 0
+    map.forEach {
+        it.forEach {
+            var charAsString = Character.toString(it)
+            findSigns(charAsString,x,y)
+            x++
+        }
+        y++
+    }
+}
+
+fun findSigns(sign: String, x: Int, y:Int ){
+    if (sign == "*"){
+        val newWall = Wall(
+                x = x,
+                y = y
+        )
+        newLevelWalls.add(newWall)
+    }
+    else if(sign in "A".."Z" || sign in "a".."z" || sign in "1".."9"){
+        val newSpot = Spot(
+                x = x,
+                y = y,
+                spotName = sign
+        )
+        newLevelSpot.add(newSpot)
+    }
+}
+
 
 fun main(args: Array<String>) {
-    var levelList: ArrayList<Nivel>
-    var wantsToContinueInProgram: Boolean = true
-    var wantsToContinueAsUser: Boolean = true
-    var wantsToContinueAsAdin: Boolean = true
-    var adminOrUser: String
-
-    //main.readLines("C:\\Users\\garoz\\Desktop\\2018 2\\parqueo\\prueba.txt")
-
+    var wantsToContinue = true
     do {
-        println(showMenu("1"))
-        adminOrUser = readLine()!!
-        if (adminOrUser == "1"){
-        }
+        showMenu(1)
+        var adminOrUser = readLine()!!
+        when(adminOrUser){
+            "1"->{
+                var newLevelName:String
+                var newLevelColor: String
+                var newLevelDirection:String
 
-    }while (wantsToContinueInProgram)
+                println("Ingrese el nombre del nuevo nivel")
+                newLevelName = readLine()!!
+                do {
+                    println("Ingrese el color del nuevo nivel")
+                    newLevelColor = readLine()!!
+                }while (colorIsTaken(newLevelColor))
+
+                do {
+                    println("Ingrese la dirección de la estructura del mapa")
+                    newLevelDirection = readLine()!!
+                }while (!directionIsValid(newLevelDirection))
+
+                createLists(readFile(newLevelDirection))
+
+
+            }
+        }
+    }while (wantsToContinue)
 }
