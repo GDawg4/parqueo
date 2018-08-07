@@ -49,7 +49,21 @@ fun directionIsValid(direction: String): Boolean{
 
 fun showMenu(option: Int):String{
     when(option){
-        0->return "Menu 1"
+        0->return """
+            1.Administrador
+            2. Conductor
+            3. Salir
+        """.trimIndent()
+        1->return """
+            1.Crear nivel
+            2.Eliminar nivel
+            3.Ver todos los niveles
+            4.Salir
+        """.trimIndent()
+        2->return """
+            1.Ingresar placa
+            2. Salir
+        """.trimIndent()
     }
     return "No válido"
 }
@@ -64,6 +78,7 @@ fun createLists(map: ArrayList<String>){
             x++
         }
         y++
+        x = 0
     }
 }
 
@@ -79,40 +94,119 @@ fun findSigns(sign: String, x: Int, y:Int ){
         val newSpot = Spot(
                 x = x,
                 y = y,
-                spotName = sign
+                name = sign
         )
         newLevelSpot.add(newSpot)
     }
 }
 
+fun levelExists(id: String):Boolean{
+    levelList.forEach {
+        if (it.id == id){
+            return true
+        }
+    }
+    return false
+}
+
+fun removeLevel(id:String){
+    levelList.forEach {
+        if (it.id == id){
+            levelList.remove(it)
+        }
+    }
+}
+
+fun plateIsRegistered(plate:String):Level?{
+    levelList.forEach {
+        if(it.plateAlreadyIn(plate)){
+        return it
+        }
+    }
+    return null
+}
+
 
 fun main(args: Array<String>) {
     var wantsToContinue = true
+    var levelID = 1
     do {
-        showMenu(1)
+        println(showMenu(0))
         var adminOrUser = readLine()!!
         when(adminOrUser){
             "1"->{
-                var newLevelName:String
-                var newLevelColor: String
-                var newLevelDirection:String
-
-                println("Ingrese el nombre del nuevo nivel")
-                newLevelName = readLine()!!
+                println(showMenu(1))
+                var adminOption = readLine()!!
                 do {
-                    println("Ingrese el color del nuevo nivel")
-                    newLevelColor = readLine()!!
-                }while (colorIsTaken(newLevelColor))
+                    var wantsToContinueAsAdmin = false
+                    when (adminOption) {
+                        "1" -> {
+                            var newLevelColor: String
+                            var newLevelDirection: String
+                            println(showMenu(2))
 
-                do {
-                    println("Ingrese la dirección de la estructura del mapa")
-                    newLevelDirection = readLine()!!
-                }while (!directionIsValid(newLevelDirection))
+                            println("Ingrese el nombre del nuevo nivel")
+                            var newLevelName: String = readLine()!!
+                            do {
+                                println("Ingrese el color del nuevo nivel")
+                                newLevelColor = readLine()!!
+                            } while (colorIsTaken(newLevelColor))
 
-                createLists(readFile(newLevelDirection))
+                            do {
+                                println("Ingrese la dirección de la estructura del mapa")
+                                newLevelDirection = readLine()!!
+                            } while (!directionIsValid(newLevelDirection))
 
-
+                            createLists(readFile(newLevelDirection))
+                            var newLevel = Level(
+                                    name = newLevelName,
+                                    color = newLevelColor,
+                                    wallList = newLevelWalls,
+                                    spotList = newLevelSpot,
+                                    id = levelID.toString()
+                            )
+                            levelList.add(newLevel)
+                            println("El nuevo nivel ha sido creado con el identificador único de $levelID")
+                            levelID++
+                            newLevelWalls = ArrayList()
+                            newLevelSpot = ArrayList()
+                        }
+                        "2" -> {
+                            println(showMenu(3))
+                            println("Ingrese el identificador \"ID\" del mapa que desea borrar")
+                            var deleteLevelName = readLine()!!
+                            if (levelExists(deleteLevelName)) {
+                                removeLevel(deleteLevelName)
+                            } else {
+                                println("Nivel no encontrado, favor intentar nuevamente")
+                            }
+                        }
+                        "3" -> {
+                            levelList.forEach { println(it.toString()) }
+                        }
+                        "4" -> {
+                            wantsToContinueAsAdmin = false
+                        }
+                    }
+                }while (wantsToContinueAsAdmin)
+            }
+            "2"->{
+                println(showMenu(3))
+                var userOption = readLine()!!
+                when(userOption){
+                    "1"->{
+                        println("Ingrese la placa que desea ingresar")
+                        var plateToCheck = readLine()!!
+                        if (plateIsRegistered(plateToCheck) == null){
+                            println("Esta placa ya está ingresada")
+                        }
+                        else{
+                            println(plateIsRegistered(plateToCheck))
+                        }
+                    }
+                }
             }
         }
+
     }while (wantsToContinue)
 }

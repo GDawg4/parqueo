@@ -3,7 +3,7 @@ package main
 class Spot(
         var x: Int,
         var y: Int,
-        var spotName: String,
+        var name: String,
         var isTaken: Boolean = false,
         var plateHere: String = ""
 ){
@@ -11,4 +11,12 @@ class Spot(
         this.isTaken = false
         this.plateHere = plate
     }
+
+    override fun toString(): String {
+        if(isTaken){
+            return "@"
+        }
+        return name
+    }
+
 }
