@@ -7,8 +7,8 @@ class Spot(
         var isTaken: Boolean = false,
         var plateHere: String = ""
 ){
-    fun ocuupySpot(plate: String){
-        this.isTaken = false
+    fun occupySpot(plate: String){
+        this.isTaken = true
         this.plateHere = plate
     }
 

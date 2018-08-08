@@ -6,17 +6,23 @@ class Level(
         var name: String,
         var color: String,
         var id: String,
-        var platesList: ArrayList<String> = ArrayList()
+        var freeSpaces: Int = spotList.size
 ){
     fun plateAlreadyIn(plate:String):Boolean{
-        platesList.forEach {
-            if (it == plate){
+        spotList.forEach {
+            if (it.plateHere == plate){
                 return true
             }
         }
         return false
     }
 
+    fun stillFreeSPaces():Boolean{
+        if (freeSpaces == 0){
+            return false
+        }
+        return true
+    }
 
     override fun toString(): String {
         var finalString = """

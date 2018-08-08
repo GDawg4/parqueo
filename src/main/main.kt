@@ -36,7 +36,7 @@ fun spotIsRepeated(map:ArrayList<String>):Boolean{
     map.forEach{
         it.forEach {
             var testString = Character.toString(it)
-            if(testString in testList){
+            if(testString in testList  && testString!="*" && testString!= " "){
                 return true
             }else
             {
@@ -117,9 +117,9 @@ fun findSigns(sign: String, x: Int, y:Int ){
     }
 }
 
-fun levelExists(id: String):Boolean{
+fun levelExists(name: String):Boolean{
     levelList.forEach {
-        if (it.name == id){
+        if (it.name == name){
             return true
         }
     }
@@ -127,10 +127,8 @@ fun levelExists(id: String):Boolean{
 }
 
 fun removeLevel(id:String){
-    levelList.forEach {
-        if (it.id == id){
-            levelList.remove(it)
-        }
+    levelList.removeIf {
+        it.id == id
     }
 }
 
@@ -143,20 +141,20 @@ fun getSpecificLevel(name:String):Level?{
     return null
 }
 
-fun plateIsRegistered(plate:String):Level?{
+fun plateIsRegistered(plate:String):Boolean{
     levelList.forEach {
         if(it.plateAlreadyIn(plate)){
-            return it
+            return true
         }
     }
-    return null
+    return false
 }
 
 fun chooseSpot(name:String, plate:String, spot:String):Boolean{
     getSpecificLevel(name)?.spotList?.forEach {
-        if (it.name == spot){
-            it.isTaken = true
-            it.plateHere = plate
+        if (it.name == spot && !it.isTaken){
+            it.occupySpot(plate)
+            println(it.plateHere)
             return true
         }
     }
@@ -237,31 +235,42 @@ fun main(args: Array<String>) {
                         "1" -> {
                             println("Ingrese la placa que desea ingresar")
                             var plateToCheck = readLine()!!
-                            if (plateIsRegistered(plateToCheck) != null) {
+                            println(plateToCheck)
+                            if (!plateIsRegistered(plateToCheck)) {
                                 levelList.forEach {
-                                    println(it.id + "."+ it.name)
+                                    if (it.stillFreeSPaces()){
+                                        println(it.id + "."+ it.name)
+                                    }
                                 }
                                 println("Ingrese el nombre del nivel dónde desea parquearse")
+
                                 var levelChoice = readLine()!!
                                 if (levelExists(levelChoice)) {
                                     println(getSpecificLevel(levelChoice).toString())
                                     println("Qué lugar desea ocupar?")
                                     var chosenSpot = readLine()!!
+
                                     if (chooseSpot(levelChoice, plateToCheck, chosenSpot)) {
                                         println("Lugar apartado!")
-                                    } else {
-                                        println("Este lugar no existe favor intentar nuevamente")
                                     }
-                                } else {
+                                    else {
+                                        println("Este lugar no puede seleccionarse, favor intentar nuevamente")
+                                    }
+                                }
+                                else {
                                     println("Este nivel no existe, favor intentar nuevamente")
                                 }
-                            } else {
+                            }
+                            else {
                                 println("Esta placa ya está ingresada")
-                                println(plateIsRegistered(plateToCheck))
                             }
                         }
+                        "2"->wantsToContinueAsUser = false
                     }
                 } while (wantsToContinueAsUser)
+            }
+            "3" -> {
+                wantsToContinue = false
             }
         }
 
