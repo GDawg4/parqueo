@@ -16,14 +16,18 @@ class Level(
         }
         return false
     }
+
+
     override fun toString(): String {
         var finalString = """
             Nombre: $name
             Identificador: $id
             Color: $color
-            Mapa: \n
+            Mapa:
         """.trimIndent()
+        //TODO lenghth of map
         for (i in 0..9){
+            finalString += "\n"
             for (s in 0..9){
                 var isEmptySpace = true
                 wallList.forEach {
@@ -42,7 +46,6 @@ class Level(
                     finalString += " "
                 }
             }
-            finalString += "\n"
         }
         return finalString
     }

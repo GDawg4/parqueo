@@ -16,6 +16,15 @@ fun colorIsTaken(color: String):Boolean{
     return false
 }
 
+fun nameIsTaken(name:String):Boolean{
+    levelList.forEach {
+        if(it.name == name){
+            return true
+        }
+    }
+    return false
+}
+
 fun readFile(direction: String):ArrayList<String>{
     val mapAsLines: ArrayList<String> = ArrayList()
     File(direction).forEachLine{mapAsLines.add(it)}
@@ -29,6 +38,9 @@ fun spotIsRepeated(map:ArrayList<String>):Boolean{
             var testString = Character.toString(it)
             if(testString in testList){
                 return true
+            }else
+            {
+                testList.add(testString)
             }
         }
     }
@@ -63,6 +75,11 @@ fun showMenu(option: Int):String{
         2->return """
             1.Ingresar placa
             2. Salir
+        """.trimIndent()
+
+        3->return """
+            1.Ingresar placa
+            2.Salir
         """.trimIndent()
     }
     return "No válido"
@@ -102,7 +119,7 @@ fun findSigns(sign: String, x: Int, y:Int ){
 
 fun levelExists(id: String):Boolean{
     levelList.forEach {
-        if (it.id == id){
+        if (it.name == id){
             return true
         }
     }
@@ -117,15 +134,34 @@ fun removeLevel(id:String){
     }
 }
 
-fun plateIsRegistered(plate:String):Level?{
+fun getSpecificLevel(name:String):Level?{
     levelList.forEach {
-        if(it.plateAlreadyIn(plate)){
-        return it
+        if (it.name == name){
+            return it
         }
     }
     return null
 }
 
+fun plateIsRegistered(plate:String):Level?{
+    levelList.forEach {
+        if(it.plateAlreadyIn(plate)){
+            return it
+        }
+    }
+    return null
+}
+
+fun chooseSpot(name:String, plate:String, spot:String):Boolean{
+    getSpecificLevel(name)?.spotList?.forEach {
+        if (it.name == spot){
+            it.isTaken = true
+            it.plateHere = plate
+            return true
+        }
+    }
+    return false
+}
 
 fun main(args: Array<String>) {
     var wantsToContinue = true
@@ -133,20 +169,21 @@ fun main(args: Array<String>) {
     do {
         println(showMenu(0))
         var adminOrUser = readLine()!!
-        when(adminOrUser){
-            "1"->{
-                println(showMenu(1))
-                var adminOption = readLine()!!
+        when (adminOrUser) {
+            "1" -> {
                 do {
-                    var wantsToContinueAsAdmin = false
+                    println(showMenu(1))
+                    var adminOption = readLine()!!
+                    var wantsToContinueAsAdmin = true
                     when (adminOption) {
                         "1" -> {
                             var newLevelColor: String
                             var newLevelDirection: String
-                            println(showMenu(2))
-
-                            println("Ingrese el nombre del nuevo nivel")
-                            var newLevelName: String = readLine()!!
+                            var newLevelName:String
+                            do {
+                                println("Ingrese el nombre del nuevo nivel")
+                                newLevelName = readLine()!!
+                            }while (nameIsTaken(newLevelName))
                             do {
                                 println("Ingrese el color del nuevo nivel")
                                 newLevelColor = readLine()!!
@@ -172,7 +209,6 @@ fun main(args: Array<String>) {
                             newLevelSpot = ArrayList()
                         }
                         "2" -> {
-                            println(showMenu(3))
                             println("Ingrese el identificador \"ID\" del mapa que desea borrar")
                             var deleteLevelName = readLine()!!
                             if (levelExists(deleteLevelName)) {
@@ -182,31 +218,52 @@ fun main(args: Array<String>) {
                             }
                         }
                         "3" -> {
-                            levelList.forEach { println(it.toString()) }
+                            levelList.forEach {
+                                println(it.toString())
+                            }
                         }
                         "4" -> {
                             wantsToContinueAsAdmin = false
                         }
                     }
-                }while (wantsToContinueAsAdmin)
+                } while (wantsToContinueAsAdmin)
             }
-            "2"->{
-                println(showMenu(3))
-                var userOption = readLine()!!
-                when(userOption){
-                    "1"->{
-                        println("Ingrese la placa que desea ingresar")
-                        var plateToCheck = readLine()!!
-                        if (plateIsRegistered(plateToCheck) == null){
-                            println("Esta placa ya está ingresada")
-                        }
-                        else{
-                            println(plateIsRegistered(plateToCheck))
+            "2" -> {
+                do {
+                    var wantsToContinueAsUser = true
+                    println(showMenu(3))
+                    var userOption = readLine()!!
+                    when (userOption) {
+                        "1" -> {
+                            println("Ingrese la placa que desea ingresar")
+                            var plateToCheck = readLine()!!
+                            if (plateIsRegistered(plateToCheck) != null) {
+                                levelList.forEach {
+                                    println(it.id + "."+ it.name)
+                                }
+                                println("Ingrese el nombre del nivel dónde desea parquearse")
+                                var levelChoice = readLine()!!
+                                if (levelExists(levelChoice)) {
+                                    println(getSpecificLevel(levelChoice).toString())
+                                    println("Qué lugar desea ocupar?")
+                                    var chosenSpot = readLine()!!
+                                    if (chooseSpot(levelChoice, plateToCheck, chosenSpot)) {
+                                        println("Lugar apartado!")
+                                    } else {
+                                        println("Este lugar no existe favor intentar nuevamente")
+                                    }
+                                } else {
+                                    println("Este nivel no existe, favor intentar nuevamente")
+                                }
+                            } else {
+                                println("Esta placa ya está ingresada")
+                                println(plateIsRegistered(plateToCheck))
+                            }
                         }
                     }
-                }
+                } while (wantsToContinueAsUser)
             }
         }
 
-    }while (wantsToContinue)
+    } while (wantsToContinue)
 }
