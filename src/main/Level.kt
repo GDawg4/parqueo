@@ -6,7 +6,9 @@ class Level(
         var name: String,
         var color: String,
         var id: String,
-        var freeSpaces: Int = spotList.size
+        var freeSpaces: Int = spotList.size,
+        var height: Int,
+        var widht: Int
 ){
     fun plateAlreadyIn(plate:String):Boolean{
         spotList.forEach {

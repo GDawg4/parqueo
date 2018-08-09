@@ -161,6 +161,17 @@ fun chooseSpot(name:String, plate:String, spot:String):Boolean{
     return false
 }
 
+fun getHeight(mapName:String):Int{
+    return readFile(mapName).size
+}
+
+fun getWidth(mapName:String):Int{
+    readFile(mapName).forEach {
+        return it.length
+    }
+    return 0
+}
+
 fun main(args: Array<String>) {
     var wantsToContinue = true
     var levelID = 1
@@ -198,7 +209,9 @@ fun main(args: Array<String>) {
                                     color = newLevelColor,
                                     wallList = newLevelWalls,
                                     spotList = newLevelSpot,
-                                    id = levelID.toString()
+                                    id = levelID.toString(),
+                                    height = getHeight(newLevelDirection),
+                                    widht = getWidth(newLevelDirection)
                             )
                             levelList.add(newLevel)
                             println("El nuevo nivel ha sido creado con el identificador único de $levelID")
