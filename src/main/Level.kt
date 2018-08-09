@@ -8,7 +8,7 @@ class Level(
         var id: String,
         var freeSpaces: Int = spotList.size,
         var height: Int,
-        var widht: Int
+        var width: Int
 ){
     fun plateAlreadyIn(plate:String):Boolean{
         spotList.forEach {
@@ -33,10 +33,9 @@ class Level(
             Color: $color
             Mapa:
         """.trimIndent()
-        //TODO lenghth of map
-        for (i in 0..9){
+        for (i in 0..height){
             finalString += "\n"
-            for (s in 0..9){
+            for (s in 0..width){
                 var isEmptySpace = true
                 wallList.forEach {
                     if(it.x == s && it.y == i){

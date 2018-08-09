@@ -211,7 +211,7 @@ fun main(args: Array<String>) {
                                     spotList = newLevelSpot,
                                     id = levelID.toString(),
                                     height = getHeight(newLevelDirection),
-                                    widht = getWidth(newLevelDirection)
+                                    width = getWidth(newLevelDirection)
                             )
                             levelList.add(newLevel)
                             println("El nuevo nivel ha sido creado con el identificador único de $levelID")
